@@ -4,7 +4,7 @@
 		
 		var originalInput = this;
 		originalInput.hide()
-		originalInput.after('<ul class="tagit-ul"></ul>');
+		originalInput.after('<ul></ul>');
 		var el = originalInput.next('ul');
 		
 		var existingValues = originalInput.val();
