@@ -3,14 +3,16 @@
 	$.fn.tagit = function(options) {
 		
 		var originalInput = this;
-		originalInput.hide().after('<ul class="tagit-ul"></ul>');
-
+		originalInput.hide()
+		originalInput.after('<ul class="tagit-ul"></ul>');
 		var el = originalInput.next('ul');
 		
-		var existingValues = originalInput.val().split(',');
-		$.each(existingValues, function (k,v) {
-			create_value(v);
-		});
+		var existingValues = originalInput.val();
+		if (existingValues) {
+			$.each(existingValues.split(','), function (k,v) {
+				create_value(v);
+			});
+		}
 
 		const BACKSPACE		= 8;
 		const ENTER			= 13;
@@ -51,7 +53,7 @@
 
 				var typed = tag_input.val();
 				typed = typed.replace(/,+$/,"");
-				typed = typed.trim();
+				typed = jQuery.trim(typed);
 
 				if (typed != "") {
 					if (is_new (typed)) {
@@ -64,19 +66,19 @@
 			}
 		});
 
-		tag_input.autocomplete({
-			source: options.availableTags, 
-			select: function(event,ui){
-				if (is_new (ui.item.value)) {
-					create_choice (ui.item.value);
-				}
-				// Cleaning the input.
-				tag_input.val("");
-
-				// Preventing the tag input to be update with the chosen value.
-				return false;
-			}
-		});
+//		tag_input.autocomplete({
+//			source: options.availableTags, 
+//			select: function(event,ui){
+//				if (is_new (ui.item.value)) {
+//					create_choice (ui.item.value);
+//				}
+//				// Cleaning the input.
+//				tag_input.val("");
+//
+//				// Preventing the tag input to be update with the chosen value.
+//				return false;
+//			}
+//		});
 
 		function is_new (value){
 			var is_new = true;
@@ -90,7 +92,7 @@
 		}
 		function create_choice (value){
 			var el = "";
-			el  = "<li class=\"tagit-choice\">\n";
+			el  = "<li data-value=\""+value+"\" class=\"tagit-choice\">\n";
 			el += value + "\n";
 			el += "<a class=\"close\">x</a>\n";
 			el += "<input type=\"hidden\" style=\"display:none;\" value=\""+value+"\" name=\"item[tags][]\">\n";
@@ -102,14 +104,10 @@
 		function rebuild_originalInput () {
 			var inputData = '';
 			el.find('.tagit-choice').each(function () {
-				inputData = inputData +','+ $(this).text();
+				inputData = inputData +','+ $(this).attr('data-value');
 			});
 			originalInput.val(inputData)
 		}
-	};
-
-	String.prototype.trim = function() {
-		return this.replace(/^\s+|\s+$/g,"");
 	};
 
 })(jQuery);
