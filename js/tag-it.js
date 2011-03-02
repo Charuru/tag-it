@@ -7,13 +7,6 @@
 		originalInput.after('<ul></ul>');
 		var el = originalInput.next('ul');
 		
-		var existingValues = originalInput.val();
-		if (existingValues) {
-			$.each(existingValues.split(','), function (k,v) {
-				create_value(v);
-			});
-		}
-
 		const BACKSPACE		= 8;
 		const ENTER			= 13;
 		const COMMA			= 44;
@@ -22,22 +15,28 @@
 		el.addClass("tagit");
 
 		// create the input field.
-		var html_input_field = "<li class=\"tagit-new\"><input class=\"tagit-input\" type=\"text\" /></li>\n";
+		var html_input_field = "<li class=\"tagit-new\"><input class=\"tagit-input form-text\" type=\"text\" /></li>\n";
 		el.html (html_input_field);
 
-		tag_input		= el.children(".tagit-new").children(".tagit-input");
+		tag_input = el.children(".tagit-new").children(".tagit-input");
 
-		$(this).click(function(e){
+		var existingValues = originalInput.val();
+		if (existingValues) {
+			$.each(existingValues.split(','), function (k,v) {
+				create_choice(v);
+			});
+		}
+
+		el.click(function(e){
 			if (e.target.tagName == 'A') {
 				// Removes a tag when the little 'x' is clicked.
 				// Event is binded to the UL, otherwise a new tag (LI > A) wouldn't have this event attached to it.
 				$(e.target).parent().remove();
+				rebuild_originalInput ();
 			}
-			else {
-				// Sets the focus() to the input field, if the user clicks anywhere inside the UL.
-				// This is needed because the input field needs to be of a small size.
-				tag_input.focus();
-			}
+			// Sets the focus() to the input field, if the user clicks anywhere inside the UL.
+			// This is needed because the input field needs to be of a small size.
+			tag_input.focus();
 		});
 
 		tag_input.keypress(function(event){
@@ -61,7 +60,8 @@
 					}
 					// Cleaning the input.
 					tag_input.val("");
-					rebuild_originalInput ()
+					rebuild_originalInput ();
+					tag_input.focus();
 				}
 			}
 		});
@@ -103,10 +103,14 @@
 		}
 		function rebuild_originalInput () {
 			var inputData = '';
-			el.find('.tagit-choice').each(function () {
-				inputData = inputData +','+ $(this).attr('data-value');
+			el.find('.tagit-choice').each(function (i) {
+				if (i === 0) {
+					inputData = $(this).attr('data-value');
+				} else {
+					inputData = inputData +','+ $(this).attr('data-value');
+				}
 			});
-			originalInput.val(inputData)
+			originalInput.val(inputData).trigger('change')
 		}
 	};
 
