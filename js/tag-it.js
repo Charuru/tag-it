@@ -1,12 +1,19 @@
 (function($) {
 
 	$.fn.tagit = function(options) {
+		
+		var originalInput = this;
+		originalInput.hide().after('<ul class="tagit-ul"></ul>');
 
-		var el = this;
+		var el = originalInput.next('ul');
+		
+		var existingValues = originalInput.val().split(',');
+		$.each(existingValues, function (k,v) {
+			create_value(v);
+		});
 
 		const BACKSPACE		= 8;
 		const ENTER			= 13;
-		const SPACE			= 32;
 		const COMMA			= 44;
 
 		// add the tagit CSS class.
@@ -38,8 +45,8 @@
 					$(el).children(".tagit-choice:last").remove();
 				}
 			}
-			// Comma/Space/Enter are all valid delimiters for new tags.
-			else if (event.which == COMMA || event.which == SPACE || event.which == ENTER) {
+			// Comma or Enter are valid delimiters for new tags.
+			else if (event.which == COMMA || event.which == ENTER) {
 				event.preventDefault();
 
 				var typed = tag_input.val();
@@ -52,6 +59,7 @@
 					}
 					// Cleaning the input.
 					tag_input.val("");
+					rebuild_originalInput ()
 				}
 			}
 		});
@@ -90,6 +98,13 @@
 			var li_search_tags = this.tag_input.parent();
 			$(el).insertBefore (li_search_tags);
 			this.tag_input.val("");
+		}
+		function rebuild_originalInput () {
+			var inputData = '';
+			el.find('.tagit-choice').each(function () {
+				inputData = inputData +','+ $(this).text();
+			});
+			originalInput.val(inputData)
 		}
 	};
 
